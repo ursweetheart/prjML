@@ -27,3 +27,13 @@ uv run python -m machinelearningproject.train_tiny
 ```
 
 This trains both models (about 2 minutes on a GPU, longer on CPU) and writes `target.pt`, `draft.pt` and `vocab.json` to `data/processed/tiny/`. Use `--steps N` to change the number of steps and `--models draft` to train one model. Load a model with `load_model(path)` and the vocabulary with `Tokenizer.load(path)`.
+
+## Scorer check
+
+`src/machinelearningproject/scorer.py` returns, for each benchmark question, the log-probability of the answer letters A–D from a Hugging Face causal language model (renormalised over the four letters), with four cyclic option shifts to measure position bias. This command checks it against `lm-eval` on 100 test questions:
+
+```bash
+uv run python -m machinelearningproject.check_scorer
+```
+
+It downloads `Qwen/Qwen2.5-0.5B` (about 1 GB), prints both accuracies, the accuracy per option shift and the position bias, and exits 0 when the accuracies differ by at most 0.01. It needs `data/processed/vnhsge.jsonl` (see Data) and runs in about one minute on a 4 GB GPU.
