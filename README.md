@@ -12,3 +12,18 @@ uv run python -m machinelearningproject.convert_vnhsge
 ```
 
 This writes `data/processed/vnhsge.jsonl` (one question per line, with a calibration/test split) and `data/processed/vnhsge_dropped.jsonl` (every skipped item with its reason). The output is identical on every run for the same clone.
+
+## Tiny Transformer
+
+A character-level decoder-only Transformer pair (target and draft), written from scratch in `src/machinelearningproject/tiny_transformer.py`. It is the test bed for the quantizer and speculative decoding; it does not answer exam questions.
+
+The training text is Truyện Kiều (public domain), taken from Vietnamese Wikisource; `data/` is git-ignored, so rebuild the file once:
+
+```bash
+curl -sG "https://vi.wikisource.org/w/index.php" --data-urlencode "title=Truyện Kiều" --data-urlencode "action=raw" \
+  | python3 -c "import re,sys,unicodedata as u;t=sys.stdin.read().split('<poem>')[1].split('</poem>')[0];print('\n'.join(l for l in (u.normalize('NFC',re.sub(r'\{\{số\|\d+\}\}','',x)).strip() for x in t.split('\n')) if l))" \
+  > data/raw/truyen_kieu.txt
+uv run python -m machinelearningproject.train_tiny
+```
+
+This trains both models (about 2 minutes on a GPU, longer on CPU) and writes `target.pt`, `draft.pt` and `vocab.json` to `data/processed/tiny/`. Use `--steps N` to change the number of steps and `--models draft` to train one model. Load a model with `load_model(path)` and the vocabulary with `Tokenizer.load(path)`.
