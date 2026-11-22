@@ -37,3 +37,13 @@ uv run python -m machinelearningproject.check_scorer
 ```
 
 It downloads `Qwen/Qwen2.5-0.5B` (about 1 GB), prints both accuracies, the accuracy per option shift and the position bias, and exits 0 when the accuracies differ by at most 0.01. It needs `data/processed/vnhsge.jsonl` (see Data) and runs in about one minute on a 4 GB GPU.
+
+## Quantizer check
+
+`src/machinelearningproject/quantizer.py` quantizes weight matrices group-wise to 8 or 4 bits, symmetric or asymmetric, and `quantize_model` does it for every linear layer of a model. This command applies it to the trained tiny models (see Tiny Transformer above) and prints the per-layer error and the validation loss at FP32, INT8 and INT4:
+
+```bash
+uv run python -m machinelearningproject.check_quantizer
+```
+
+It needs `data/processed/tiny/` and the Truyện Kiều text, runs in about 15 seconds on a CPU and exits 0 when INT8 changes the loss less than INT4 does.
