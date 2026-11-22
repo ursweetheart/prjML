@@ -28,7 +28,7 @@ UNKNOWN_YEAR = "unknown (≤2023)"
 # "A." or "A)" after whitespace or ? . : (not after "+" or "(", so "+C." and "(B)" stay text),
 # or a bare "A " at the start of a line.
 LABEL = re.compile(r"(?<![^\s?.:])([ABCD])[.)]|^[ \t]*([ABCD])(?=[ \t]+\S)", re.M)
-QUESTION_NUMBER = re.compile(r"^\s*Câu\s*\d+\s*[:.]\s*")
+QUESTION_NUMBER = re.compile(r"^\s*(?:câu|question)\s*\d+\s*[:.)]?\s*", re.I)  # any case, separator optional
 YEAR = re.compile(r"(?<!\d)(20[12]\d)(?!\d)")
 
 
@@ -85,6 +85,12 @@ def _self_test():
     assert opts == ["Anh D, ông A và anh\nC.", "Chị B và ông A.", "Ông A, anh C.", "Ông A."], opts
     assert parse_options("Tim 2 ngăn?\nA. Ếch.\nB. Cá.\nC. Mèo.\nC. Thỏ") is None
     assert parse_options("Câu 3. Hỏi?\nA. 1\nB. 2\nC. 3\nD. 4")[0] == "Hỏi?"
+    opts4 = "\nA. 1\nB. 2\nC. 3\nD. 4"
+    assert parse_options("CÂU 24:Hạn chế của nguồn lao động" + opts4)[0] == "Hạn chế của nguồn lao động"
+    assert parse_options("Câu 12) Hỏi?" + opts4)[0] == "Hỏi?"
+    assert parse_options("Câu 6 Câu “Con trâu” nói?" + opts4)[0] == "Câu “Con trâu” nói?"  # only the first number goes
+    assert parse_options("Câu 2\nCâu nói nào?" + opts4)[0] == "Câu nói nào?"
+    assert parse_options("Question 6: the medicine" + opts4)[0] == "the medicine"
     assert parse_options("A. x\nB. y\nC. z\nD. w") is None  # no stem
     assert parse_options("Ai sai?\n\nA. Ông C và anh A.\nB. Anh V.\nC. Ông C.\nD. Anh Q.")[1] == [
         "Ông C và anh A.", "Anh V.", "Ông C.", "Anh Q."]  # "anh A." inside option A

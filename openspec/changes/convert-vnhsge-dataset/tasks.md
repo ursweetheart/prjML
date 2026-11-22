@@ -27,3 +27,8 @@
 
 - [x] 5.1 Extend the image check to also drop items whose `Question` contains `\includegraphics` (reason `image`), and add a `_self_test()` assert for an item with empty `Image_Question` and an embedded figure; verify the self-test passes
 - [x] 5.2 Rerun the conversion; verify `grep -c includegraphics data/processed/vnhsge.jsonl` prints 0, kept records drop by about 161 (to about 15,867), two runs give the same `sha256sum`, and each group's calibration count is still half its size rounded down
+
+## 6. Question-number prefix in every spelling
+
+- [x] 6.1 Make the stem-number pattern case-insensitive with an optional separator (`:`, `.`, `)`) and cover `Question N`, and add `_self_test()` asserts for `CÂU 24:Hạn chế`, `Câu 12)`, `Câu 6 Câu “Con trâu”` (second `Câu` kept), `Câu 2` followed by a newline and `Question 6: the medicine`; verify the self-test passes
+- [x] 6.2 Rerun the conversion; verify no kept record's stem matches `^\s*(câu|question)\s*\d+` (case-insensitive), two runs give the same `sha256sum`, each group's calibration count is still half its size rounded down, and record the new kept and `duplicate` counts in `notes.md`

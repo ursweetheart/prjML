@@ -75,7 +75,11 @@ The conversion SHALL split the question text into a stem and four options. A lab
 - **THEN** the item is dropped with reason `options`
 
 ### Requirement: Question numbering is removed from the stem
-The stem SHALL NOT start with the exam's question number (`Câu 12:`, `Câu 12 :`, `Câu 12.`).
+The stem SHALL NOT start with the exam's question number, in any letter case and with or without a separator (`Câu 12:`, `CÂU 12:`, `Câu 12 :`, `Câu 12.`, `Câu 12)`, `Câu 12` followed by a space or newline, `Question 12:`).
+
+#### Scenario: Uppercase or separator-less number
+- **WHEN** the question text starts with `CÂU 24:Hạn chế của nguồn lao động`, `Câu 6 Câu “Con trâu đi trước”` or `Question 6: the medicine`
+- **THEN** the stem starts with `Hạn chế của nguồn lao động`, `Câu “Con trâu đi trước”` and `the medicine` respectively
 
 #### Scenario: Numbered stem
 - **WHEN** the question text starts with `Câu 1:  Dao động của một vật`
