@@ -47,3 +47,19 @@ uv run python -m machinelearningproject.check_quantizer
 ```
 
 It needs `data/processed/tiny/` and the Truyện Kiều text, runs in about 15 seconds on a CPU and exits 0 when INT8 changes the loss less than INT4 does.
+
+## Conformal prediction and speculative decoding
+
+- `src/machinelearningproject/conformal.py` (A.2): split conformal prediction on an `(N, 4)` array of option probabilities, with the plain score `1 - p` and randomized APS.
+- `src/machinelearningproject/speculative.py` (A.4): speculative decoding over two models that share a vocabulary, with accept/reject counts. It has no KV cache, so it checks correctness and is not a speed measurement.
+
+Each module checks itself, on the CPU and with no data files:
+
+```bash
+uv run python -c "from machinelearningproject.conformal import _self_test; _self_test()"
+uv run python -c "from machinelearningproject.speculative import _self_test; _self_test()"
+```
+
+The speculative check draws 60,000 samples three times, so expect it to take a minute or more.
+
+`notebooks/ai_scorer.ipynb` is the Colab notebook with its saved outputs: the scorer over all questions with four option shifts, conformal sets and coverage, the A.3 error on Qwen2.5-0.5B, and the A.4 checks on toy and real models. It needs a GPU, the data file on Google Drive and the repo cloned into `/content/project`.
